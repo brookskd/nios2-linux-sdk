@@ -1,0 +1,4 @@
+#!/bin/bash
+# Drop first argument (sopc2dts)
+shift
+java -jar /buildroot/sopc2dts-rel_${SOPC_TO_DTS_VERSION}/sopc2dts/sopc2dts.jar $@
