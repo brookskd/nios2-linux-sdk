@@ -26,7 +26,7 @@ RUN   yum update -y &&\
       | tar -xj &&\
       pushd buildroot-${BUILDROOT_VERSION} &&\
       curl -SL -o configs/nios2_defconfig "https://rocketboards.org/foswiki/pub/Documentation/NiosIILinuxUserManual/nios2_defconfig?t=1466337990" &&\
-      make nios2_defconfig &&\
+      make -s nios2_defconfig &&\
       make -j$(nproc) &&\
       popd &&\
       curl -SL "https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_MAJOR}.x/linux-${KERNEL_VERSION}.tar.xz" \
@@ -37,7 +37,7 @@ RUN   yum update -y &&\
       | tar -xz &&\
       pushd sopc2dts-rel_${SOPC_TO_DTS_VERSION} &&\
       pushd sopc2dts &&\
-      make &&\
+      make -s &&\
       popd &&\
       popd
 
