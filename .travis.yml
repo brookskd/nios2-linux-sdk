@@ -1,0 +1,25 @@
+sudo: required
+
+language: generic
+
+services:
+  - docker
+
+env:
+  global:
+  - secure: YnGtbratCo9XsDKzHjPgHj1muKuxSqTbbfc3gbqdf4xeJgRZr0Q9ObddRbYecwNprH+5PbQupqu7aX2RiSlFnLPNdqnAUx+GKjur2nI72KCIRUKYFS5Ov11mMRTlC4+hULAfWVSoxz4suBh6GfNYmMK+yLF5aFSAcpnepAB5h2xpI4ZYZEwtDeSsUQPRr1pAjRF13AX6G2ZAaaDhHfyWw3ct+cTCNv7arzma/XIOTC4tWYutXAbzRhucWRJuqrQ5RLRQpo94/kXGp9q50eyMeVpRlCqcRW16pWg1vbcBTAqYrgKRgiD37JHaTS6Ffep+WIPNUiAVWvoKhiL7isLDCuY/DauxrcuXum6ad5lVkYrEgk+57gnkYhI2YEh6kG68wjuLCSpceOWS4jEsGvh/p1G7/k7aJDQID1IpSYLmkLkrwPiDgv4kLkk+ZCtc3VgSInUarYQvIOMoSgKkXgCttYiGXpZtwrSBJyFmJ8iG2taYikqNXEfDaKL2oYkMmikdA45dxVlnlpyyWRxIejaT/aftqFYyE4P86gjZ8es5t9xexvMVU2FhhbC/g9qnBjsnVYQL6pn/ug993Y/mbHLHqOB0QHYQFAl7QBBBMXSA9YecNu3gzjTWfnUMvZqcclwUIjONRpgFPoVdF6RC3OEuGjhqBNW+1ixQTkWnkrfzVV8=
+  - secure: iAZTFJKSbxv5ZMoASmX+wRBQ2jTUN1rtRc5d1NUsPZuxTxA4gCYiDmmbxN/yHSSBM7SlxZRanQw0sE1mlvBk634wRq5Pn4yVm3yDeElgctr0APqBpDv4fw5RjAKB42WlnOUsl7K/Cnhn96ElhYIn+tRVR8l01FgfPeXf8VEAhdpL8vjhNhO6hQcDm5iSaQj+mQm6qOWMmE7Pypf3SKjQFMaHFrLkeMnRXIfdwTwvBYTsc9Wu+cwkRbIo70LcQbuJzK35fZAYddoFiM8Qc1d5b8Ba7WqBCCJN4eXo/1jNC2Eubb0XPmoMuE+5uoPisrb5HXDTWYzySXJSWow0YfGoujVZKeRwypDOJtBtTToT75BTVJGfd4Aip95jOqlg0OokoBeSw7Sl0RvzmBUEUKzGAOoOiKTlqQyM8lESGnaxXNMfC+avAg9Add7CmIbcmXxYz4m+53SElvPbXSWMisv5jzEhqo1U68bAO/0SOr+BOLbLJhNZm1J6UlAHge3TMutb9dFGygpcyWDCEhtq1tlo1OCIYbgkCPBjpiyFSqmYlPsRUQJcMlKFf/VS+FHMQGNfa65DRbFYF1zjKy8bzU/K+loqeou3kW7pGNwGgObjurCJPePHeh+dPyHRK8xi/L1rkngJeuErFddXNxn2fQcbShlF2ADYd66AunDQdOLb19U=
+  - secure: hBhMvH1qzgGFFLE42aVLixBVJUrateDzxXlnF7p24GuozLVpieRwjeNt2pNWK5ogp4IQMS8NwdfPrORSWBooslvLUtDMOhCOt71tcLejpG86dBsOh8odWvSGpIW7+cvxxoHcmLIuolNdhjzYMo9AUvrpWFIHrqtyrPDrI58Azz7JsRYoG7l9oKIC3PpHxjE3A+9+9KLNCNPyqJ6oUoTdiqCjqbFm5+dGAbocCvDLWAmXYzgIusSp2ydl6jI3RbNezRQpqBasLqJCdQ9WhLjALCwiX1MSZ0wu/Lettb3WYUpk7DNCSUoGFjLXCjc4FAoFyZW7f9ozbnTnXKJgox4zJZdjAEM9lLHgySX/W+FNiIzNzsTaWoHiXJhzrwildCdI+Ajah1oXeNcu0QR8urheS+MNFmKHCvbc5AsyYjvAfWmVJqDBBWldaoQRRMgbHuYFx4vpxIc2SV8My53y8myxp+/NM+103QWw3k+QCca9T8EBLC8ySXzr0kHKBUEabRb+sEX3PSwUB3dcI5yXRBeqb3y/OuJndwnm7w4J2sf+BRyDT24/L/Pd6kTHw28mpYZz6tMLWDjV9V1K9OsrEMYzOVNAdByVLWAmTrsN9gexvr1kjxcjl850uQv/gfKB4baqBHoLLvVfJh37wyLMpUZqJ+1eYQ5qWwW6zzzsiBsUlDM=
+  - COMMIT=${TRAVIS_COMMIT::8}
+
+script:
+  - docker build -t brookskd/nios2-linux-sdk:$COMMIT .
+
+after-success:
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=brookskd/nios2-linux-sdk
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
+  - docker logout
