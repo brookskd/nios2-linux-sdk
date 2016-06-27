@@ -14,6 +14,11 @@ ENV KERNEL_VERSION ${KERNEL_MAJOR}.${KERNEL_MINOR}.${KERNEL_PATCH}
 ENV UBOOT_SOCFPGA_VERSION 2016.05
 ENV SOPC_TO_DTS_VERSION 13.1
 
+ENV PATH /opt/nios2/sourceryg++-${CODESOURCERY_VERSION_MAJOR}/bin:${PATH}
+
+ENV ARCH nios2
+ENV CROSS_COMPILE=nios2-linux-gnu-
+
 WORKDIR /buildroot
 
 RUN   yum update -y &&\
@@ -26,7 +31,7 @@ RUN   yum update -y &&\
       | tar -xj &&\
       pushd buildroot-${BUILDROOT_VERSION} &&\
       curl -SL -o configs/nios2_defconfig "https://rocketboards.org/foswiki/pub/Documentation/NiosIILinuxUserManual/nios2_defconfig?t=1466337990" &&\
-      make -s nios2_defconfig &&\
+      make -s nios2_defconfig > /dev/null &&\
       make -j$(nproc) &&\
       popd &&\
       curl -SL "https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_MAJOR}.x/linux-${KERNEL_VERSION}.tar.xz" \
@@ -37,13 +42,8 @@ RUN   yum update -y &&\
       | tar -xz &&\
       pushd sopc2dts-rel_${SOPC_TO_DTS_VERSION} &&\
       pushd sopc2dts &&\
-      make -s &&\
+      make -s > /dev/null &&\
       popd &&\
       popd
 
 COPY sopc2dts /usr/local/bin/
-
-ENV PATH /opt/nios2/sourceryg++-${CODESOURCERY_VERSION_MAJOR}/bin:${PATH}
-
-ENV ARCH nios2
-ENV CROSS_COMPILE=nios2-linux-gnu-
