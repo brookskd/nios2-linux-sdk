@@ -13,7 +13,7 @@ env:
   - COMMIT=${TRAVIS_COMMIT::8}
 
 script:
-  - travis_wait docker build -t brookskd/nios2-linux-sdk:$COMMIT .
+  - travis_wait 120 docker build -t brookskd/nios2-linux-sdk:$COMMIT .
 
 after-success:
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
