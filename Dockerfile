@@ -21,16 +21,17 @@ ENV CROSS_COMPILE=nios2-linux-gnu-
 
 WORKDIR /buildroot
 
+COPY nios2_defconfig buildroot-${BUILDROOT_VERSION}/configs/
+
 RUN   yum update -y &&\
       yum groupinstall -y "Development Tools" &&\
-      yum install -y ncurses-devel hmaccalc zlib-devel binutils-devel elfutils-libelf-devel java-1.8.0-openjdk-devel wget bc &&\
+      yum install -y glibc.i686 ncurses-devel hmaccalc zlib-devel binutils-devel elfutils-libelf-devel java-1.8.0-openjdk-devel wget bc &&\
       mkdir -p /opt/nios2 &&\
       curl -SL "https://sourcery.mentor.com/GNUToolchain/package14496/public/nios2-linux-gnu/sourceryg++-${CODESOURCERY_VERSION}-nios2-linux-gnu-i686-pc-linux-gnu.tar.bz2" \
       | tar -xj -C /opt/nios2 &&\
       curl -SL "https://buildroot.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.bz2" \
       | tar -xj &&\
       pushd buildroot-${BUILDROOT_VERSION} &&\
-      curl -SL -o configs/nios2_defconfig "https://rocketboards.org/foswiki/pub/Documentation/NiosIILinuxUserManual/nios2_defconfig?t=1466337990" &&\
       make -s nios2_defconfig &&\
       make -s -j$(nproc) &&\
       popd &&\
