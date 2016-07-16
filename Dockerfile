@@ -15,7 +15,7 @@ ENV SOPC_TO_DTS_VERSION 13.1
 ENV PATH /opt/nios2/sourceryg++-${CODESOURCERY_VERSION_MAJOR}/bin:${PATH}
 
 ENV ARCH nios2
-ENV CROSS_COMPILE=nios2-linux-gnu-
+ENV CROSS_COMPILE nios2-linux-gnu-
 
 WORKDIR /buildroot
 
@@ -39,7 +39,7 @@ RUN   yum update -y &&\
       pushd linux &&\
       ln -s ../configs/linux/nios2_defconfig .config &&\
       make olddefconfig &&\
-      make -j 2 &&\
+      make -j$(nproc) &&\
       popd &&\
       curl -SL "https://github.com/altera-opensource/u-boot-socfpga/archive/v${UBOOT_SOCFPGA_VERSION}.tar.gz" \
       | tar -xz &&\
