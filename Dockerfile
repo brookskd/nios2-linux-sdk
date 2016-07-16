@@ -6,10 +6,8 @@ ENV CODESOURCERY_VERSION_MINOR 10
 ENV CODESOURCERY_VERSION ${CODESOURCERY_VERSION_MAJOR}-${CODESOURCERY_VERSION_MINOR}
 ENV BUILDROOT_VERSION 2016.05
 
-ENV KERNEL_MAJOR 4
-ENV KERNEL_MINOR 6
-ENV KERNEL_PATCH 3
-ENV KERNEL_VERSION ${KERNEL_MAJOR}.${KERNEL_MINOR}.${KERNEL_PATCH}
+ENV KERNEL_URL https://github.com/brookskd/linux-nios2.git
+ENV KERNEL_BRANCH linux-4.6.y
 
 ENV UBOOT_SOCFPGA_VERSION 2016.05
 ENV SOPC_TO_DTS_VERSION 13.1
@@ -21,7 +19,7 @@ ENV CROSS_COMPILE=nios2-linux-gnu-
 
 WORKDIR /buildroot
 
-COPY nios2_defconfig buildroot-${BUILDROOT_VERSION}/configs/
+COPY configs configs
 
 RUN   yum update -y &&\
       yum groupinstall -y "Development Tools" &&\
@@ -33,11 +31,16 @@ RUN   yum update -y &&\
       curl -SL "https://buildroot.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.bz2" \
       | tar -xj &&\
       pushd buildroot-${BUILDROOT_VERSION} &&\
+      ln -s ../configs/buildroot/nios2_defconfig configs/nios2_defconfig &&\
       make -s nios2_defconfig &&\
       make -s -j$(nproc) &&\
       popd &&\
-      curl -SL "https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_MAJOR}.x/linux-${KERNEL_VERSION}.tar.xz" \
-      | tar -xJ &&\
+      git clone --depth 1 --branch "${KERNEL_BRANCH}" "${KERNEL_URL}" linux &&\
+      pushd linux &&\
+      ln -s ../configs/linux/nios2_defconfig .config &&\
+      make olddefconfig &&\
+      make -j 2 &&\
+      popd &&\
       curl -SL "https://github.com/altera-opensource/u-boot-socfpga/archive/v${UBOOT_SOCFPGA_VERSION}.tar.gz" \
       | tar -xz &&\
       curl -SL "https://github.com/altera-opensource/sopc2dts/archive/rel_${SOPC_TO_DTS_VERSION}.tar.gz" \
