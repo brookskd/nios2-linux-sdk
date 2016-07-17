@@ -20,6 +20,7 @@ ENV CROSS_COMPILE nios2-linux-gnu-
 WORKDIR /buildroot
 
 COPY configs configs/
+COPY sopc2dts /usr/local/bin/
 
 RUN   yum update -y &&\
       yum groupinstall -y "Development Tools" &&\
@@ -35,6 +36,14 @@ RUN   yum update -y &&\
       make -s nios2_defconfig &&\
       make -s -j$(nproc) &&\
       popd &&\
+      curl -SL "https://github.com/altera-opensource/sopc2dts/archive/rel_${SOPC_TO_DTS_VERSION}.tar.gz" \
+      | tar -xz &&\
+      pushd sopc2dts-rel_${SOPC_TO_DTS_VERSION} &&\
+      pushd sopc2dts &&\
+      make -s &&\
+      popd &&\
+      popd &&\
+      sopc2dts -i configs/qsys/nios_system.sopcinfo -o nios_system.dts &&\
       git clone --depth 1 --branch "${KERNEL_BRANCH}" "${KERNEL_URL}" linux &&\
       pushd linux &&\
       cp ../configs/linux/nios2_defconfig .config &&\
@@ -42,13 +51,5 @@ RUN   yum update -y &&\
       make -j$(nproc) &&\
       popd &&\
       curl -SL "https://github.com/altera-opensource/u-boot-socfpga/archive/v${UBOOT_SOCFPGA_VERSION}.tar.gz" \
-      | tar -xz &&\
-      curl -SL "https://github.com/altera-opensource/sopc2dts/archive/rel_${SOPC_TO_DTS_VERSION}.tar.gz" \
-      | tar -xz &&\
-      pushd sopc2dts-rel_${SOPC_TO_DTS_VERSION} &&\
-      pushd sopc2dts &&\
-      make -s &&\
-      popd &&\
-      popd
+      | tar -xz
 
-COPY sopc2dts /usr/local/bin/
