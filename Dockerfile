@@ -31,7 +31,7 @@ RUN   yum update -y &&\
       curl -SL "https://buildroot.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.bz2" \
       | tar -xj &&\
       pushd buildroot-${BUILDROOT_VERSION} &&\
-      ln -s ../configs/buildroot/nios2_defconfig configs/nios2_defconfig &&\
+      ln -s ../../configs/buildroot/nios2_defconfig configs/nios2_defconfig &&\
       make -s nios2_defconfig &&\
       make -s -j$(nproc) &&\
       popd &&\
