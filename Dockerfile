@@ -19,7 +19,7 @@ ENV CROSS_COMPILE nios2-linux-gnu-
 
 WORKDIR /buildroot
 
-COPY configs configs
+COPY configs configs/
 
 RUN   yum update -y &&\
       yum groupinstall -y "Development Tools" &&\
@@ -37,7 +37,7 @@ RUN   yum update -y &&\
       popd &&\
       git clone --depth 1 --branch "${KERNEL_BRANCH}" "${KERNEL_URL}" linux &&\
       pushd linux &&\
-      ln -s ../configs/linux/nios2_defconfig .config &&\
+      cp ../configs/linux/nios2_defconfig .config &&\
       make olddefconfig &&\
       make -j$(nproc) &&\
       popd &&\
